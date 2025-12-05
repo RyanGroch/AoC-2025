@@ -28,33 +28,22 @@ with open(sys.argv[1], "r") as f:
                     break
 
 
+new_ids = []
+ids.sort()
+
 for i in range(len(ids)):
-    low,high = ids[i]
-    low = int(low)
-    high = int(high)
-    extra_pass = True
+    l,h = ids[i]
+    if len(new_ids) > 0:
+        lp,hp = new_ids[-1]
+        if lp <= l <= hp or lp <= h <= hp or l <= lp <= h or l <= hp <= h:
+            new_ids[-1] = (min(l, lp), max(h,hp))
+        else:
+            new_ids.append((l, h))
+    else:
+        new_ids.append((l, h))
 
-    while extra_pass:
-        extra_pass = False
-        for j in range(i):
-            prev_low,prev_high = ids[j]
-            prev_low = int(prev_low)
-            prev_high = int(prev_high)
-
-            if low >= prev_low and low <= prev_high:
-                extra_pass = True
-                low = prev_high + 1
-
-            if high >= prev_low and high <= prev_high:
-                extra_pass = True
-                high = prev_low - 1
-
-    if low <= high:
-        # print("IGNORED: ", ids[i], low, high)
-        fresh2 += (1 + high - low)
-        continue
-
-    # print(ids[i], low,high, (high - low + 1))
+for l,h in new_ids:
+    fresh2 += (h - l + 1)
 
 print(fresh1)
 print(fresh2)
