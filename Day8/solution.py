@@ -5,9 +5,6 @@ points = []
 connections = []
 circuits_table = {}
 circuits_rev = {}
-# deld = set()
-# id_to_circ = {}
-
 
 with open(sys.argv[1], "r") as f:
     for line in f:
@@ -24,8 +21,7 @@ for i in range(len(points)):
 
 connections.sort(key = lambda x: x[0])
 
-for i in range(1000):
-    # print(circuits_rev)
+def connect(i):
     conn = connections[i]
 
     if conn[1] in circuits_table and conn[2] in circuits_table:
@@ -33,7 +29,7 @@ for i in range(1000):
         s2 = circuits_table[conn[2]]
 
         if s1 is s2:
-            continue
+            return
 
         s3 = s1.union(s2)
 
@@ -47,14 +43,8 @@ for i in range(1000):
 
         del circuits_rev[id(s1)]
         del circuits_rev[id(s2)]
-        # deld.add(id(s1))
-        # deld.add(id(s2))
-        # del id_to_circ[id(s1)]
-        # del id_to_circ[id(s2)]
 
         circuits_rev[id(s3)] = l3
-        print(circuits_rev[id(s3)])
-        # id_to_circ[id(s3)] = s3
 
     elif conn[1] in circuits_table:
         s = circuits_table[conn[1]]
@@ -75,10 +65,23 @@ for i in range(1000):
         s.add(conn[2])
         circuits_table[conn[2]] = s
         circuits_rev[id(s)] = [conn[1], conn[2]]
-        # id_to_circ[id(s)] = s
+
+
+for i in range(1000):
+    connect(i)
 
 final = list(circuits_rev.values())
 final.sort(key=lambda x: len(x), reverse=True)
 total = len(final[0]) * len(final[1]) * len(final[2])
 
-print(total)
+i = 1000
+while i < len(connections):
+    connect(i)
+
+    if len(circuits_rev) == 1 and len(circuits_table) == 1000:
+        break
+
+    i += 1
+
+print(f"Part 1: {total}")
+print(f"Part 2: {connections[i][1][0] * connections[i][2][0]}")
